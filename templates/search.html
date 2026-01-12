@@ -14,15 +14,10 @@
                     <div class="mb-3">
                         <label for="search_term" class="form-label">Enter Name to Search</label>
                         <input type="text" class="form-control" id="search_term" name="search_term" 
-                               placeholder="e.g., John Smith" required>
+                               placeholder="e.g., Anshuman Diwakar" required>
                         <div class="form-text">Search is case-insensitive and supports partial matches</div>
                     </div>
-                    
-                    <div class="mb-3 form-check">
-                        <input type="checkbox" class="form-check-input" id="exact_match" name="exact_match">
-                        <label class="form-check-label" for="exact_match">Exact match only</label>
-                    </div>
-                    
+
                     <div class="d-grid gap-2">
                         <button type="submit" class="btn btn-info btn-lg">
                             <i class="bi bi-search"></i> Search Now
@@ -32,77 +27,8 @@
                         </a>
                     </div>
                 </form>
-                
-                <!-- Real-time validation (optional) -->
-                <div class="mt-4">
-                    <h6>Quick Validation</h6>
-                    <div class="input-group">
-                        <input type="text" class="form-control" id="validate_name" placeholder="Enter name to check if exists">
-                        <button class="btn btn-outline-secondary" type="button" onclick="validateName()">
-                            Check
-                        </button>
-                    </div>
-                    <div id="validation_result" class="mt-2"></div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="card shadow mt-4">
-            <div class="card-header bg-secondary text-white">
-                <h5 class="mb-0"><i class="bi bi-question-circle"></i> How Search Works</h5>
-            </div>
-            <div class="card-body">
-                <ul>
-                    <li><strong>Without "Exact match":</strong> Searches for names containing your search term<br>
-                        <small>Example: "John" will find "John Doe", "Mary Johnson", "Johnny Smith"</small>
-                    </li>
-                    <li><strong>With "Exact match":</strong> Searches for exact name only<br>
-                        <small>Example: "John Doe" will only find "John Doe" (not "John Doe Jr.")</small>
-                    </li>
-                    <li>Searches are case-insensitive (John = john = JOHN)</li>
-                </ul>
             </div>
         </div>
     </div>
 </div>
-{% endblock %}
-
-{% block scripts %}
-<script>
-function validateName() {
-    const name = $('#validate_name').val().trim();
-    const resultDiv = $('#validation_result');
-    
-    if (!name) {
-        resultDiv.html('<div class="alert alert-warning">Please enter a name</div>');
-        return;
-    }
-    
-    resultDiv.html('<div class="alert alert-info">Checking...</div>');
-    
-    $.ajax({
-        url: '{{ url_for("validate_name") }}',
-        type: 'POST',
-        data: { name: name },
-        success: function(response) {
-            if (response.exists) {
-                const record = response.record;
-                resultDiv.html(`
-                    <div class="alert alert-success">
-                        <strong>✓ Record Found!</strong><br>
-                        Name: ${record.name}<br>
-                        Address: ${record.address}<br>
-                        City: ${record.city}, ${record.state}
-                    </div>
-                `);
-            } else {
-                resultDiv.html('<div class="alert alert-danger">✗ No record found with that name</div>');
-            }
-        },
-        error: function() {
-            resultDiv.html('<div class="alert alert-danger">Error validating name</div>');
-        }
-    });
-}
-</script>
 {% endblock %}

@@ -4,21 +4,17 @@ import os
 
 app = Flask(__name__)
 
-# Configuration
 app.config['SECRET_KEY'] = 'your-secret-key-change-this-in-production'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///address_book.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['TEMPLATES_AUTO_RELOAD'] = True
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 
-# Initialize database
 db.init_app(app)
 
-# Create database tables
 with app.app_context():
     db.create_all()
 
-# Disable caching in development
 @app.after_request
 def add_header(response):
     if app.debug:
@@ -27,7 +23,6 @@ def add_header(response):
         response.headers['Expires'] = '0'
     return response
 
-# Routes
 @app.route('/')
 def index():
     """Home page with recent records and search form"""
@@ -41,7 +36,6 @@ def index():
 def add_record():
     """Add a new address record"""
     if request.method == 'POST':
-        # Get form data
         name = request.form.get('name', '').strip()
         address = request.form.get('address', '').strip()
         city = request.form.get('city', '').strip()
@@ -50,18 +44,15 @@ def add_record():
         phone = request.form.get('phone', '').strip()
         email = request.form.get('email', '').strip()
         
-        # Validate required fields
         if not name or not address:
             flash('Name and Address are required fields!', 'danger')
             return render_template('add_record.html')
         
-        # Check if name already exists (optional - remove if you want duplicates)
         existing = AddressRecord.query.filter_by(name=name).first()
         if existing:
             flash(f'Record with name "{name}" already exists!', 'warning')
             return render_template('add_record.html')
         
-        # Create new record
         new_record = AddressRecord(
             name=name,
             address=address,
@@ -94,11 +85,9 @@ def search():
             flash('Please enter a name to search!', 'warning')
             return render_template('search.html')
         
-        # Perform search
         if exact_match:
             records = AddressRecord.query.filter_by(name=search_term).all()
         else:
-            # Case-insensitive partial match
             records = AddressRecord.query.filter(
                 AddressRecord.name.ilike(f'%{search_term}%')
             ).all()
@@ -118,7 +107,6 @@ def validate_name():
     if not name:
         return jsonify({'exists': False})
     
-    # Check if name exists (case-insensitive)
     record = AddressRecord.query.filter(
         AddressRecord.name.ilike(name)
     ).first()
@@ -142,7 +130,6 @@ def edit_record(id):
     record = AddressRecord.query.get_or_404(id)
     
     if request.method == 'POST':
-        # Update record
         record.name = request.form.get('name', '').strip()
         record.address = request.form.get('address', '').strip()
         record.city = request.form.get('city', '').strip()

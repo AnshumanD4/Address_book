@@ -5,7 +5,7 @@ db = SQLAlchemy()
 
 class AddressRecord(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), nullable=False, index=True)  # Added index for faster search
+    name = db.Column(db.String(100), nullable=False, index=True) 
     address = db.Column(db.Text, nullable=False)
     city = db.Column(db.String(50))
     state = db.Column(db.String(50))
