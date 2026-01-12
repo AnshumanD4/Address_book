@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+
+{% block title %}Search Results - Address Book{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-10 mx-auto">
+        <div class="card shadow">
+            <div class="card-header {% if records %}bg-success{% else %}bg-warning{% endif %} text-white">
+                <h4 class="mb-0">
+                    <i class="bi bi-{% if records %}check-circle{% else %}exclamation-triangle{% endif %}"></i>
+                    Search Results for: "{{ search_term }}"
+                </h4>
+            </div>
+            <div class="card-body">
+                {% if records %}
+                    <div class="alert alert-success">
+                        <i class="bi bi-check-circle-fill"></i> Found {{ count }} record(s)
+                        {% if exact_match %}(Exact match){% else %}(Partial match){% endif %}
+                    </div>
+                    
+                    {% for record in records %}
+                    <div class="card mb-3 record-card">
+                        <div class="card-header bg-light">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0">{{ record.name }}</h5>
+                                <small class="text-muted">ID: {{ record.id }}</small>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h6><i class="bi bi-geo-alt"></i> Address</h6>
+                                    <p>{{ record.address }}</p>
+                                    <p>
+                                        {% if record.city %}{{ record.city }}{% endif %}
+                                        {% if record.state %}, {{ record.state }}{% endif %}
+                                        {% if record.zip_code %}{{ record.zip_code }}{% endif %}
+                                    </p>
+                                </div>
+                                <div class="col-md-6">
+                                    <h6><i class="bi bi-telephone"></i> Contact Information</h6>
+                                    {% if record.phone %}
+                                    <p><strong>Phone:</strong> {{ record.phone }}</p>
+                                    {% endif %}
+                                    {% if record.email %}
+                                    <p><strong>Email:</strong> {{ record.email }}</p>
+                                    {% endif %}
+                                    <p class="text-muted small">
+                                        <strong>Created:</strong> {{ record.created_at.strftime('%Y-%m-%d %H:%M') }}<br>
+                                        <strong>Updated:</strong> {{ record.updated_at.strftime('%Y-%m-%d %H:%M') }}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-footer bg-transparent">
+                            <div class="btn-group">
+                                <a href="{{ url_for('edit_record', id=record.id) }}" class="btn btn-warning btn-sm">
+                                    <i class="bi bi-pencil"></i> Edit
+                                </a>
+                                <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" 
+                                        data-bs-target="#deleteModal{{ record.id }}">
+                                    <i class="bi bi-trash"></i> Delete
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Delete Modal -->
+                    <div class="modal fade" id="deleteModal{{ record.id }}" tabindex="-1">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header bg-danger text-white">
+                                    <h5 class="modal-title">Confirm Delete</h5>
+                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body">
+                                    Are you sure you want to delete the record for <strong>{{ record.name }}</strong>?
+                                    This action cannot be undone.
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                    <form action="{{ url_for('delete_record', id=record.id) }}" method="POST" class="d-inline">
+                                        <button type="submit" class="btn btn-danger">Delete</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    
+                {% else %}
+                    <div class="alert alert-warning">
+                        <i class="bi bi-exclamation-triangle-fill"></i> 
+                        No records found matching "{{ search_term }}"
+                        {% if exact_match %}(with exact match){% endif %}
+                    </div>
+                    
+                    <div class="text-center mt-4">
+                        <p class="lead">Suggestions:</p>
+                        <ul class="list-unstyled">
+                            <li>Try a different spelling</li>
+                            <li>Use partial match (uncheck "Exact match")</li>
+                            <li>Check if the record exists in the database</li>
+                        </ul>
+                        <div class="mt-3">
+                            <a href="{{ url_for('search') }}" class="btn btn-info me-2">
+                                <i class="bi bi-search"></i> Search Again
+                            </a>
+                            <a href="{{ url_for('add_record') }}" class="btn btn-primary">
+                                <i class="bi bi-plus-circle"></i> Add New Record
+                            </a>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="mt-4 text-center">
+            <a href="{{ url_for('index') }}" class="btn btn-secondary">
+                <i class="bi bi-house"></i> Back to Home
+            </a>
+            <a href="{{ url_for('search') }}" class="btn btn-info">
+                <i class="bi bi-search"></i> New Search
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

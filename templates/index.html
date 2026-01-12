@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block title %}Home - Address Book{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8 mx-auto">
+        <div class="card shadow mb-4">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0"><i class="bi bi-book"></i> Welcome to Address Book</h4>
+            </div>
+            <div class="card-body">
+                <p class="lead">A simple application to store and search address records.</p>
+                
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="card text-white bg-success mb-3">
+                            <div class="card-body text-center">
+                                <h1 class="display-4">{{ total_records }}</h1>
+                                <p class="card-text">Total Records</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card text-center">
+                            <div class="card-body">
+                                <h5>Quick Actions</h5>
+                                <a href="{{ url_for('add_record') }}" class="btn btn-primary btn-lg mt-2">
+                                    <i class="bi bi-plus-circle"></i> Add New Record
+                                </a>
+                                <a href="{{ url_for('search') }}" class="btn btn-info btn-lg mt-2">
+                                    <i class="bi bi-search"></i> Search Records
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {% if recent_records %}
+                <h5 class="border-bottom pb-2">Recently Updated Records</h5>
+                <div class="row">
+                    {% for record in recent_records %}
+                    <div class="col-md-6 mb-3">
+                        <div class="card record-card">
+                            <div class="card-body">
+                                <h6 class="card-title">{{ record.name }}</h6>
+                                <p class="card-text small text-muted">
+                                    <i class="bi bi-geo-alt"></i> {{ record.city }}, {{ record.state }}<br>
+                                    <i class="bi bi-clock"></i> Updated: {{ record.updated_at.strftime('%Y-%m-%d') }}
+                                </p>
+                                <div class="btn-group btn-group-sm">
+                                    <a href="{{ url_for('view_record', id=record.id) }}" class="btn btn-outline-primary">
+                                        <i class="bi bi-eye"></i> View
+                                    </a>
+                                    <a href="{{ url_for('edit_record', id=record.id) }}" class="btn btn-outline-warning">
+                                        <i class="bi bi-pencil"></i> Edit
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle"></i> No records found. <a href="{{ url_for('add_record') }}">Add your first record</a>.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Quick Search Form -->
+        <div class="card shadow">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0"><i class="bi bi-search"></i> Quick Search</h5>
+            </div>
+            <div class="card-body">
+                <form action="{{ url_for('search') }}" method="POST" class="row g-2">
+                    <div class="col-md-8">
+                        <input type="text" class="form-control" name="search_term" placeholder="Enter name to search..." required>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="form-check mt-2">
+                            <input class="form-check-input" type="checkbox" name="exact_match" id="exact_match">
+                            <label class="form-check-label" for="exact_match">Exact Match</label>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-info w-100">
+                            <i class="bi bi-search"></i> Search
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
